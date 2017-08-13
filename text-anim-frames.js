@@ -1,25 +1,22 @@
 
 function parseLayerLine(state, line) {
-  if (line[0] !== '^') {
-    return null;
-  }
-  var result = [];
-  var x;
-  for (x=1; x<line.length; x++) {
-    if (line[x] !== ' ') {
-      result.push({x: x, name: line[x]});
+  if (line[0] === '^') {
+    var result = [];
+    for (var x=1; x<line.length; x++) {
+      if (line[x] !== ' ') {
+        result.push({x: x, name: line[x]});
+      }
     }
+    return result;
   }
-  return result;
 }
 
 function parseLine(state, line, lineNo) {
   var layers = parseLayerLine(state, line);
   if (layers) {
     var prevLine = state.lines.pop();
-    state.lines.push(prevLine.substring(0, layers[0].x));
-    var i;
-    for (i=0; i<layers.length; i++) {
+    line = prevLine.substring(0, layers[0].x);
+    for (var i=0; i<layers.length; i++) {
       var curr = layers[i];
       var next = layers[i+1];
       curr.lineNo = lineNo-1;
@@ -27,28 +24,33 @@ function parseLine(state, line, lineNo) {
       state.layers[curr.name] = curr;
     }
   }
-  else {
-    state.lines.push(line);
-  }
+  state.lines.push(line);
 }
 
-function parseText(text) {
+function parseFrame(text) {
   var state = {
     lines: [],
     layers: {}
   };
   var lines = text.split('\n');
-  var i;
-  for (i=0; i<lines.length; i++) {
+  for (var i=0; i<lines.length; i++) {
     parseLine(state, lines[i], i);
   }
   return state;
 }
 
-const result = parseText(`
+function parseFrames(text) {
+  var frames = text.split('\n=====\n');
+  return frames.map(parseFrame);
+}
+
+const result = parseFrames(`
 foo bar
 ^   a
     bazboo
 ^   b  c
+=====
+foo boo
+^   c
 `);
-console.log(result);
+console.log(JSON.stringify(result, null, 2));
