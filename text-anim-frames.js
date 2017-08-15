@@ -15,16 +15,21 @@ function parseLine(state, line, lineNo) {
   var layers = parseLayerLine(state, line);
   if (layers) {
     var prevLine = state.lines.pop();
-    line = prevLine.substring(0, layers[0].x);
+    var untagged = prevLine.substring(0, layers[0].x);
+    var lineObjects = [untagged];
     for (var i=0; i<layers.length; i++) {
       var curr = layers[i];
       var next = layers[i+1];
       curr.lineNo = lineNo-1;
       curr.text = prevLine.substring(curr.x, next && next.x);
       state.layers[curr.name] = curr;
+      lineObjects.push(curr);
     }
+    state.lines.push(lineObjects);
   }
-  state.lines.push(line);
+  else {
+    state.lines.push(line);
+  }
 }
 
 function parseFrame(text) {
