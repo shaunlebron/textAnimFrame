@@ -1,3 +1,26 @@
+// Text Animation Frame
+// (parse text into base text + animated layers)
+
+//------------------------------------------------------------------------------
+// JS Module Boilerplate
+//------------------------------------------------------------------------------
+
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], factory);
+  }
+  else if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  }
+  else {
+    root.textAnimFrame = factory();
+  }
+}(this, function() { // start module anonymous scope
+"use strict";
+
+//------------------------------------------------------------------------------
+// Parsing
+//------------------------------------------------------------------------------
 
 function parseLayerLine(state, line) {
   if (line[0] === '^') {
@@ -32,7 +55,7 @@ function parseLine(state, line, lineNo) {
   }
 }
 
-function parseFrame(text) {
+function parse(text) {
   var state = {
     lines: [],
     layers: {}
@@ -44,18 +67,10 @@ function parseFrame(text) {
   return state;
 }
 
-function parseFrames(text) {
-  var frames = text.split('\n=====\n');
-  return frames.map(parseFrame);
-}
+var API = {
+  parse: parse,
+};
 
-const result = parseFrames(`
-foo bar
-^   a
-    bazboo
-^   b  c
-=====
-foo boo
-^   c
-`);
-console.log(JSON.stringify(result, null, 2));
+return API;
+
+})); // end module anonymous scope
